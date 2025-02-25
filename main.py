@@ -39,7 +39,7 @@ def main():
                 sys.exit()
             for bullet in bullets:
                 if obj.is_colliding(bullet):
-                    obj.kill()
+                    obj.split()
                     bullet.kill()
 
         for obj in drawable:
