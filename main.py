@@ -24,8 +24,10 @@ def main():
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    score = 0
     player_obj = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     field_obj = AsteroidField()
+    font = pygame.font.Font(None, 64)
 
     while True:
         for event in pygame.event.get():
@@ -41,9 +43,13 @@ def main():
                 if obj.is_colliding(bullet):
                     obj.split()
                     bullet.kill()
+                    score += obj.radius
 
         for obj in drawable:
             obj.draw(screen)
+        hud = font.render(f"Score = {score}", False, "white")
+        hudpos = hud.get_rect(centerx=SCREEN_WIDTH/10, y=10)
+        screen.blit(hud, hudpos)
         pygame.display.flip()
         dt = clock.tick(60)/1000
 
