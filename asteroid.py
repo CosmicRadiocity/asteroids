@@ -1,7 +1,7 @@
 import pygame
 import random
 from circleshape import CircleShape
-from constants import ASTEROID_MIN_RADIUS, POWERUP_TYPES
+from constants import ASTEROID_MIN_RADIUS, LIFE_CHANCE, SHIELD_CHANCE, BOOST_CHANCE
 from powerup import PowerUp
 
 class Asteroid(CircleShape):
@@ -28,6 +28,10 @@ class Asteroid(CircleShape):
         ast1.velocity = ast1rot * 1.2
         ast2 = Asteroid(self.position.x, self.position.y, ast2rad)
         ast2.velocity = ast2rot * 1.2
-        if random.randint(0, 100) > 50:
+        powerup_chance = random.randint(0, 100)
+        if powerup_chance <= LIFE_CHANCE:
             powerup = PowerUp(self.position.x, self.position.y, 1)
-        
+        elif powerup_chance <= SHIELD_CHANCE:
+            powerup = PowerUp(self.position.x, self.position.y, 2)
+        elif powerup_chance <= BOOST_CHANCE:
+            powerup = PowerUp(self.position.x, self.position.y, 3)

@@ -41,7 +41,7 @@ def main():
         for obj in enemies:
             if obj.is_colliding(player_obj):
                 if player_obj.lives > 0:
-                    if player_obj.hit_cooldown <= 0:
+                    if player_obj.hit_cooldown <= 0 and player_obj.shield_cooldown <= 0:
                         player_obj.lives -= 1
                         player_obj.hit_cooldown = PLAYER_HIT_COOLDOWN
                 else:
@@ -58,6 +58,10 @@ def main():
                 obj.kill()
                 if obj.type == 1 and player_obj.lives < 5:
                     player_obj.lives += 1
+                elif obj.type == 2:
+                    player_obj.shield_cooldown = PLAYER_SHIELD_COOLDOWN
+                elif obj.type == 3 and player_obj.boost_cooldown <= 0:
+                    player_obj.boost_cooldown = PLAYER_BOOST_COOLDOWN
 
         for obj in drawable:
             obj.draw(screen)

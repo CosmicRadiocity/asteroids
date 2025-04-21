@@ -1,6 +1,6 @@
 import pygame
 from circleshape import CircleShape
-from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN, PLAYER_HIT_COOLDOWN
+from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN
 from shot import Shot
 
 class Player(CircleShape):
@@ -11,6 +11,8 @@ class Player(CircleShape):
         self.shot_cooldown = 0
         self.lives = 3
         self.hit_cooldown = 0
+        self.shield_cooldown = 0
+        self.boost_cooldown = 0
     
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -21,13 +23,14 @@ class Player(CircleShape):
         return [a, b, c]
     
     def draw(self, screen):
+        color = "white"
         if self.hit_cooldown > 0:
-            if self.lives <= 0:
-                pygame.draw.polygon(screen, "red", self.triangle(), 2)
-            else:
-                pygame.draw.polygon(screen, "yellow", self.triangle(), 2)
-        else:
-            pygame.draw.polygon(screen, "white", self.triangle(), 2)
+            color = "red"
+        elif self.shield_cooldown > 0:
+            color = "blue"
+        elif self.boost_cooldown > 0:
+            color = "yellow"
+        pygame.draw.polygon(screen, color, self.triangle(), 2)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -40,21 +43,29 @@ class Player(CircleShape):
         keys = pygame.key.get_pressed()
         self.shot_cooldown -= dt
         self.hit_cooldown -= dt
+        self.boost_cooldown -= dt
+        self.shield_cooldown -= dt
 
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             self.rotate(dt)
-        if keys[pygame.K_d]:
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             self.rotate(-dt)
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             self.move(dt)
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
 
     def shoot(self):
         if self.shot_cooldown < 0:
-            bullet = Shot(self.position.x, self.position.y)
+            if self.boost_cooldown > 0:
+                bullet = Shot(self.position.x, self.position.y, True)
+            else: 
+                bullet = Shot(self.position.x, self.position.y, False)
             bullet.velocity = pygame.Vector2(0 ,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
-            self.shot_cooldown = PLAYER_SHOOT_COOLDOWN
+            if self.boost_cooldown > 0:
+                self.shot_cooldown = PLAYER_SHOOT_COOLDOWN / 2
+            else:
+                self.shot_cooldown = PLAYER_SHOOT_COOLDOWN
 
